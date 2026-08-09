@@ -37,7 +37,6 @@ const Github = {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
 
         try {
-            // Validate token by fetching user profile
             const headers = {
                 'Authorization': `token ${token}`,
                 'Accept': 'application/vnd.github.v3+json'
@@ -52,7 +51,6 @@ const Github = {
             const data = await response.json();
             const githubUsername = username || data.login;
 
-            // Fetch repos
             const reposRes = await fetch(`${this.apiBase}/users/${githubUsername}/repos?sort=updated&per_page=5`, { headers });
             const repos = reposRes.ok ? await reposRes.json() : [];
 
@@ -75,17 +73,36 @@ const Github = {
                 }))
             };
 
-            // Save to database
-            Database.connectGithub(token, githubUsername, githubData);
+            let user = Database.getCurrentUser();
 
-            // Update UI
-            this.updateUI(githubData);
-            app.showToast(`Connected to GitHub as @${githubUsername}!`, 'success');
-            this.closeModal();
+            if (!user) {
+                const name = data.name || data.login;
+                const email = data.email || `${data.login}@github.local`;
+                const registerResult = Database.register(name, email, 'github_' + Date.now());
 
-            // Refresh settings if open
-            if (document.getElementById('page-settings').classList.contains('active')) {
-                Settings.loadGithubData();
+                if (registerResult.success) {
+                    const loginResult = Database.login(email, 'github_' + Date.now());
+                    if (loginResult.success) {
+                        user = loginResult.user;
+                        app.user = user;
+                        app.updateUIForUser();
+                    }
+                } else if (registerResult.error === 'Email already registered') {
+                    app.showToast('An account with this GitHub email already exists. Please sign in with email first.', 'error');
+                    this.closeModal();
+                    return;
+                }
+            }
+
+            if (user) {
+                Database.connectGithub(token, githubUsername, githubData);
+                this.updateUI(githubData);
+                app.showToast(`Connected to GitHub as @${githubUsername}!`, 'success');
+                this.closeModal();
+
+                if (document.getElementById('page-settings').classList.contains('active')) {
+                    Settings.loadGithubData();
+                }
             }
 
         } catch (err) {

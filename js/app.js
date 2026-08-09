@@ -6,6 +6,7 @@ const app = {
     currentPage: 'landing',
     user: null,
     challenges: [],
+    CHALLENGE_START_DATE: new Date('2026-08-09').toISOString(),
 
     init() {
         this.loadChallenges();
@@ -161,11 +162,12 @@ const app = {
     emailSignIn() {
         const email = document.getElementById('signinEmail').value.trim();
         const password = document.getElementById('signinPassword').value;
+        const remember = document.getElementById('signinRemember').checked;
         if (!email || !password) {
             this.showAuthError('Please fill in all fields');
             return;
         }
-        const result = Database.login(email, password);
+        const result = Database.login(email, password, remember);
         if (result.success) {
             this.setUser(result.user);
             this.showToast('Welcome back!', 'success');
@@ -305,15 +307,25 @@ const app = {
         if (!grid) return;
         grid.innerHTML = '';
         const completed = this.user ? this.user.completedDays : [];
-        const current = this.user ? this.user.currentDay : 1;
+
+        let current, startDate;
+        if (this.user) {
+            current = this.user.currentDay;
+            startDate = new Date(this.user.startDate);
+        } else {
+            startDate = new Date(this.CHALLENGE_START_DATE);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const diffTime = today - startDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            current = Math.min(Math.max(diffDays, 1), 60);
+        }
 
         for (let i = 1; i <= 60; i++) {
             const cell = document.createElement('div');
             cell.className = 'day-cell';
             cell.textContent = i;
 
-            // Calculate actual date
-            const startDate = this.user ? new Date(this.user.startDate) : new Date();
             const cellDate = new Date(startDate);
             cellDate.setDate(startDate.getDate() + (i - 1));
             cell.dataset.date = cellDate.toISOString();
@@ -323,7 +335,6 @@ const app = {
             else if (i === current) cell.classList.add('current');
             else if (i < current) cell.classList.add('missed');
 
-            // Tooltip events
             cell.addEventListener('mouseenter', () => Calendar.showTooltip(cell));
             cell.addEventListener('mouseleave', () => Calendar.hideTooltip());
             cell.addEventListener('click', () => Calendar.showTooltip(cell, true));

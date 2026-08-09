@@ -574,17 +574,67 @@ body {
 .danger-zone-title { color: var(--danger); font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 
 /* Responsive */
+@media (max-width: 1024px) {
+    .dashboard-grid { gap: 16px; }
+    .challenge-content { gap: 16px; }
+}
+
 @media (max-width: 768px) {
     .dashboard-grid, .challenge-content, .profile-grid, .settings-grid { grid-template-columns: 1fr; }
     .bottom-nav { display: block; }
     .nav-links { display: none; }
-    .hero { padding: 120px 0 60px; }
-    .auth-card { padding: 32px 24px; }
-    .days-grid { grid-template-columns: repeat(7, 1fr); max-width: 300px; }
-    .profile-sidebar, .settings-sidebar { flex-direction: row; overflow-x: auto; padding-bottom: 8px; }
-    .profile-menu-item, .settings-nav-item { white-space: nowrap; }
+    .hero { padding: 100px 0 40px; }
+    .hero h1 { font-size: clamp(2rem, 8vw, 3rem); }
+    .hero p { font-size: 1rem; }
+    .auth-card { padding: 24px 20px; }
+    .dashboard-header, .challenge-header, .profile-header, .settings-header { padding-top: 100px; }
+    .days-grid { grid-template-columns: repeat(7, 1fr); max-width: 280px; gap: 4px; }
+    .day-cell { font-size: 0.65rem; border-radius: 4px; }
+    .profile-sidebar, .settings-sidebar { flex-direction: row; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
+    .profile-menu-item, .settings-nav-item { white-space: nowrap; flex-shrink: 0; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .stat-value { font-size: 1.5rem; }
+    .btn-lg { padding: 14px 24px; font-size: 1rem; }
+    .toast { min-width: unset; width: calc(100vw - 48px); max-width: 400px; }
+    .modal { padding: 24px; width: 95%; }
+    .section-header { margin-bottom: 32px; }
+    .section-header h2 { font-size: clamp(1.5rem, 5vw, 2rem); }
+    .track-grid { grid-template-columns: 1fr; }
+    .testimonial-grid { grid-template-columns: 1fr; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .challenge-meta { gap: 12px; font-size: 0.85rem; }
+    .resource-item { padding: 10px 12px; }
+    .file-upload-area { padding: 24px 16px; }
+    .github-stats { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .badge-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .settings-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .toggle-switch { align-self: flex-end; }
+    .container { padding: 0 16px; }
 }
 
+@media (max-width: 480px) {
+    .hero { padding: 80px 0 32px; }
+    .dashboard-header, .challenge-header, .profile-header, .settings-header { padding-top: 80px; }
+    .days-grid { max-width: 240px; gap: 3px; }
+    .day-cell { font-size: 0.6rem; }
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat-card { padding: 16px; }
+    .stat-value { font-size: 1.3rem; }
+    .btn { padding: 10px 18px; font-size: 0.9rem; }
+    .btn-lg { padding: 12px 20px; font-size: 0.95rem; }
+    .auth-card { padding: 20px 16px; }
+    .modal { padding: 20px; width: 100%; border-radius: var(--radius-lg); }
+    .toast { min-width: unset; width: calc(100vw - 32px); padding: 12px 16px; }
+    .challenge-day-badge { font-size: 0.8rem; padding: 6px 14px; }
+    .profile-avatar-large { width: 80px; height: 80px; font-size: 2rem; }
+    .profile-name { font-size: 1.4rem; }
+    .bottom-nav { padding: 8px 0 16px; }
+    .bottom-nav-item { font-size: 0.65rem; }
+    .bottom-nav-item i { font-size: 1.1rem; }
+    .success-icon { width: 80px; height: 80px; font-size: 2rem; }
+    .success-title { font-size: 1.8rem; }
+    .success-xp { font-size: 2rem; }
+}
 .hidden { display: none !important; }
 .w-full { width: 100%; }
 .mb-2 { margin-bottom: 16px; }

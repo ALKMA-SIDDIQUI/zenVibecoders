@@ -88,7 +88,7 @@ const Database = {
         return { success: true, user: this.sanitizeUser(user) };
     },
 
-    login(email, password) {
+    login(email, password, remember = true) {
         const db = this.getDB();
         const user = db.users.find(u => u.email.toLowerCase() === email.toLowerCase());
         if (!user) return { success: false, error: 'User not found' };
@@ -103,20 +103,30 @@ const Database = {
             token: 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 16),
             expiresAt: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
         };
-        localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+
+        if (remember) {
+            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        } else {
+            sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        }
 
         return { success: true, user: this.sanitizeUser(user) };
     },
 
     logout() {
         localStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(SESSION_KEY);
         return true;
     },
 
     getCurrentUser() {
-        const session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+        let session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
+        if (!session) {
+            session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+        }
         if (!session || Date.now() > session.expiresAt) {
             localStorage.removeItem(SESSION_KEY);
+            sessionStorage.removeItem(SESSION_KEY);
             return null;
         }
         const db = this.getDB();
@@ -125,7 +135,10 @@ const Database = {
     },
 
     getFullUser() {
-        const session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+        let session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
+        if (!session) {
+            session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+        }
         if (!session) return null;
         const db = this.getDB();
         return db.users.find(u => u.id === session.userId) || null;
